@@ -1,0 +1,269 @@
+
+/*
+ * Smart_Home.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Mr.M.O
+*/
+
+#include "../../MCAL/DIO/DIO_Reg.h"
+#include "../../MCAL/DIO/DIO_types.h"
+#include "../../MCAL/DIO/DIO.h"
+#include "../../MCAL/UART/UART.h"
+#include "../../HAL/servo/servo.h"
+#include "../../LIB/STDTYPES.h"
+#include "../../LIB/Bit_Math.h"
+#include "../../MCAL/ADC/ADC.h"
+#include <util/delay.h>
+#include <avr/eeprom.h>
+#include<stdio.h>
+#include<string.h>
+#include "Funcs.h"
+
+void Smart_Home()
+{char k;
+
+	// Config PINs
+	DIO_SetPinDirection(PORTD, PIN0,INPUT); // Rx enable
+	DIO_SetPinDirection(PORTD, PIN1,OUTPUT); // Tx
+	DIO_SetPinDirection(PORTA , PIN0 , OUTPUT); // LED RED --> close
+	DIO_SetPinDirection(PORTA , PIN1 , OUTPUT);// LED GREEN --> open
+	DIO_SetPinDirection(PORTA , PIN2 , OUTPUT);// LIGHTS
+	DIO_SetPinDirection(PORTA , PIN3 , OUTPUT);// A_C
+
+	//   R_pass 12 --> 4 no  R_user  20 --> 5 letter 21 --> 6
+	// char** User ;
+	 char* User;
+	//char received_data[2][5];
+	u8 status;
+	 //Init. USART & Servo
+	USART_Init(9600);
+	Servo_init();
+	// Close DOOR
+	OCR1A = 290;
+	/* Intro & Ask for User name*/
+	USART_SendString("\n HI \n");
+	USART_SendString(" Please Enter Your UserName : \n");
+	k=USART_ReceiveString(User);
+
+	USART_SendString(" UserName : \n");
+	USART_TxChar(k);
+	//RT_SendString(&User);/*
+/*USART_SendString("\n ********************** \n");
+	USART_SendString(" Password : \n");
+	USART_ReceiveString(received_data);
+	USART_SendString(" Pass : ");
+	USART_SendString(received_data);
+	int x =(strcmp(received_data,"1234"));
+
+	if(x==0)
+	{
+		status=1;
+	}
+	else
+	{
+		status=0;
+	}
+	if(status == 1)
+	{
+		USART_SendString("Welcome");
+	}
+	else
+	{
+		USART_SendString(" Incorrect \n");
+		if(count == 2)
+		{
+			USART_SendString(" BYE BYE ");
+		}
+	}
+
+	for(count = 0 ; count <3; count++)
+	{
+		USART_SendString(" Enter Password : \n");
+		status=Check_Pass();
+		if(status == 1)
+		{
+			USART_SendString("Welcome");
+			Chooses();
+		}
+		else
+		{
+			USART_SendString(" Incorrect \n");
+			if(count == 2)
+			{
+				USART_SendString(" BYE BYE ");
+			}
+		}
+	}*/
+	}
+
+
+/*
+			while(i!=0 )
+			{
+					USART_SendString(" Please Enter Your Password : \n");
+					USART_ReceiveString(RPass);
+
+					int pass =strncasecmp("1234",RPass,4); //mohem
+
+					if(pass==0 )
+					{
+						USART_SendString(" Welcome \n");
+						i=5;
+						break;
+					}
+					else
+					{
+						USART_SendString(" Valid password \n");
+					}
+					if(i==1)
+					{
+					USART_SendString(" BYE \n");
+					}
+					break;
+				}*/
+
+/*
+while(i >0)
+	{
+		// Ask for Password
+			USART_SendString(" Please Enter Your Password : \n");
+			USART_ReceiveString(Pass);
+
+			pass =strncasecmp("1234",Pass,4);
+			if(pass == 0)
+				statu = 1;
+			else
+			{
+				statu =0;
+				i--;
+			}
+
+			if(statu ==1)
+			{
+				USART_SendString(" HI MR : \n");
+				USART_SendString(User);
+				USART_SendString("\n");
+				Chooses();
+			}
+			else if(statu ==0)
+			{
+				USART_SendString(" Valid Password \n");
+			}
+	}*/
+/************************************************************************/
+#include "../../LIB/STDTYPES.h"
+#include "../../MCAL/DIO/DIO_Reg.h"
+#include "../../MCAL/DIO/DIO_types.h"
+#include "../../MCAL/DIO/DIO.h"
+#include "../../MCAL/UART/UART.h"
+#include "../../HAL/servo/servo.h"
+#include<stdio.h>
+#include<string.h>
+
+char Check_Pass(void)
+{
+		char Pass[5], received_data,password_set[5]="1234",status;
+		unsigned char count=0;
+
+		USART_SendString("Please Enter Your Password : \n");
+		for(count =0 ; count <4; count++)
+		{
+			received_data=USART_RxChar();
+			Pass[count]=received_data;
+
+		}
+		count=0;
+		Pass[4]='\0';
+		int x =(strcmp(Pass,password_set));
+			if(x==0)
+			{
+				status=1;
+			}
+			else
+			{
+				status=0;
+			}
+			return status;
+	/*char received_data,password_entered[5],password_set[5]="1234";
+	unsigned char count=0,status=0;
+	while(status==0)
+	{
+
+		while(count<4)
+		{
+			received_data=USART_RxChar();
+			password_entered[count]=received_data;
+			count++;
+		}
+		count=0;
+
+		password_entered[4]='\0';
+
+		if(!(strcmp(password_entered,password_set)))
+		{
+			status=1;
+		}
+		else
+		{
+			status=0;
+		}
+	}*/
+}
+
+
+void Chooses(void)
+{
+	u8 c;
+	USART_SendString(" The DOOR Is Locked \n");
+	USART_SendString(" PRESS 0 To Display The Main Menu \n");
+	while(1)
+	{
+		c=USART_RxChar();
+		switch (c)
+		{
+			case '0' :
+			USART_SendString(" PRESS 1 TO UNLOCKED The DOOR \n");
+			USART_SendString(" PRESS 2 TO LOCKED The DOOR \n");
+			USART_SendString(" PRESS 3 TO TURN ON Lights \n");
+			USART_SendString(" PRESS 4 TO TURN OFF Lights \n");
+			USART_SendString(" PRESS 5 TO TURN ON The Air Conditioner \n");
+			USART_SendString(" PRESS 6 TO TURN OFF The Air Conditioner \n");
+			break;
+
+			case '1' :
+			DIO_SetPinValue(PORTB,PIN0, HIGH);
+			DIO_SetPinValue(PORTB,PIN1, LOW);
+			USART_SendString(" DOOR COLSED\n");
+			OCR1A = 290;
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+			case '2' :
+			DIO_SetPinValue(PORTB,PIN0, LOW);
+			DIO_SetPinValue(PORTB,PIN1, HIGH);
+			USART_SendString(" DOOR OPEN \n");
+			OCR1A = 190;
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+			case '3' : DIO_SetPinValue(PORTB,PIN2, HIGH);
+			USART_SendString(" LIGHT TURN ON \n");
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+			case '4' : DIO_SetPinValue(PORTB,PIN2, LOW);
+			USART_SendString(" LIGHT TURN OFF \n");
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+			case '5' : DIO_SetPinValue(PORTB,PIN3, HIGH);
+			USART_SendString(" A_C TURN ON \n");
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+			case '6' : DIO_SetPinValue(PORTB,PIN3, LOW);
+			USART_SendString(" A_C TURN OFF \n");
+			USART_SendString(" PRESS 0 to Return to the main menu \n");
+			break;
+
+			default:
+				break;
+		}
+	}
+}
