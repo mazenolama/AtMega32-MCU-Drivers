@@ -12,10 +12,10 @@ Components :
 * KeyPad
 * LCD
 * SERVO Motor
-* Seven Segmant
+* Seven Segment
 * Stepper Motor
 
 LIB :
 * BIT MATH
 * STDTYPES
-also contains on some Examples 
+also contains some Examples 
